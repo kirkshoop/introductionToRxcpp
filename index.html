@@ -169,7 +169,7 @@ user input and IO are values distributed in time
 > * 
 ---
 
-# my son says it is like a card game
+# my son says, space vs time is observed when playing cards
 
 ???
 
@@ -217,25 +217,28 @@ user input and IO are values distributed in time
 
 ---
 
-# rxcpp subscription lifetime
+```
+observable | subscribe(subscriber);
+```
 
 .center[
 .mermaid[
 sequenceDiagram
-participant App
 participant observable
 participant subscriber
+participant App
 App->> observable: subscribe(subscriber)
 activate observable
+note over observable,subscriber: calls to the subscriber must never overlap in time
 loop value
-    observable->> subscriber: on_next()
+    observable -->> subscriber: on_next()
 end
 alt failure
-    observable--x subscriber: on_error()
+    observable --x subscriber: on_error()
 else finish
-    observable--x subscriber: on_completed()
+    observable --x subscriber: on_completed()
 end
-subscriber->> subscriber: unsubscribe()
+subscriber -->> subscriber: unsubscribe()
 deactivate observable
 ]
 ]
@@ -243,6 +246,191 @@ deactivate observable
 ???
 
 > *
+
+---
+
+```
+range(2, 2) | rxo::map([](long l){return to_string(l);} | subscribe(); 
+```
+
+.center[
+.mermaid[
+sequenceDiagram
+participant input observable
+participant map subscriber
+participant map observable
+participant App subscriber
+participant App
+App ->> map observable: subscribe(App subscriber)
+activate map observable
+map observable ->> input observable: subscribe(map subscriber)
+activate input observable
+input observable -->> map subscriber: on_next(2)
+map subscriber -->> App subscriber: on_next(to_string(2))
+input observable --x map subscriber: on_completed()
+map subscriber --x App subscriber: on_completed()
+App subscriber -->> App subscriber: unsubscribe()
+deactivate map observable
+map subscriber -->> map subscriber: unsubscribe()
+deactivate input observable
+]
+]
+
+???
+
+> *
+
+---
+
+# how to get a stream of tweets
+
+--
+
+```
+auto tweetthread = observe_on_new_thread();
+```
+
+--
+
+```
+auto requesttwitterstream = defer([=](){
+    auto url = oauth2SignUrl("https://stream.twitter.com/...");
+```
+
+???
+
+> * defer is used to call oauth2SignUrl when the request is repeated
+
+--
+
+```
+    return http.create(http_request{url, method, {}, {}}) |
+```
+
+--
+
+```
+        rxo::map([](http_response r){
+            return r.body.chunks;
+        }) |
+```
+
+???
+
+> * only keep the strings from the request body
+
+--
+
+```
+        merge(tweetthread);
+}) |
+```
+
+--
+
+```
+twitter_stream_reconnection(tweetthread);
+```
+
+???
+
+> * twitter_stream_reconnection - new operator to retry the request on failure
+
+---
+
+# how to handle twitter retry protocol
+
+--
+
+```
+auto twitter_stream_reconnection = [](observe_on_one_worker tweetthread){
+    return [=](observable<string> chunks){
+        return chunks |
+```
+
+???
+
+> * an operator is a function that takes an observable and returns an observable
+
+--
+
+```
+            timeout(seconds(90), tweetthread) |
+```
+
+???
+
+> * error when no string has been appended to the body in 90s 
+
+--
+
+```
+            on_error_resume_next([=](exception_ptr ep) {
+                try {rethrow_exception(ep);
+                } catch (const http_exception& ex) {
+                    return twitterRetryAfterHttp(ex);
+                } catch (const timeout_error& ex) {
+                    return empty<string>();
+                }
+                return error<string>(ep, tweetthread);
+            }) |
+```
+
+???
+
+> * catches errors and returns a new observable to use
+> * the returned observable might complete instantly
+> * the returned observable might complete after a delay
+
+--
+
+```
+            repeat(0);
+}; };
+```
+
+???
+
+> * when the chunks observable is completed, make a new http request.
+
+---
+
+# how to call sentiment web service
+
+```
+auto requestsentiment = observable<>::defer([=]() {
+```
+
+--
+
+```
+    std::map<string, string> headers;
+    headers["Content-Type"] = "application/json";
+    headers["Authorization"] = "Bearer " + key;
+```
+
+--
+
+```
+    auto body = json::parse(
+        R"({"Inputs":{"input1":[{"tweet_text": "Hi!"}]},"GlobalParameters":{}})"
+    );
+```
+
+--
+
+```
+    return http.create(http_request{url, "POST", headers, body.dump()}) |
+        rxo::map([](http_response r){
+            return r.body.complete;
+        }) |
+        merge(workerthread);
+});
+```
+
+???
+
+> * 
 
 ---
 
