@@ -41,6 +41,10 @@
             color: lightgreen;
         }
 
+        img {
+            width: 50%;
+        }
+
         table {
             border-collapse: collapse;
             width: 100%;
@@ -60,6 +64,12 @@
         .green {
             color: seagreen
         }
+
+
+        .image-50 img {width: 50%}
+        .image-60 img {width: 60%}
+        .image-70 img {width: 70%}
+        .image-80 img {width: 80%}
 
         .column:first-of-type {float:left}
         .column:last-of-type {float:right}
@@ -171,6 +181,12 @@ user input and IO are values distributed in time
 
 # my son says, space vs time is observed when playing cards
 
+.center[
+.image-70[
+![poker game](content/poker-gremlin.gif)
+]
+]
+
 ???
 
 > * kiran's idea
@@ -181,12 +197,13 @@ user input and IO are values distributed in time
 
 .center[
 
+.image-50[
 ![poker hand](content/poker-game-264599_1280.jpg)
+]
 
-## cards in the hand can be processed now
-
+cards in the hand can be processed now
 .green[
-### array and list are values distributed in space
+array and list are __values distributed in space__
 ]
 
 ]
@@ -201,15 +218,58 @@ user input and IO are values distributed in time
 
 .center[
 
+.image-60[
 ![poker deck](content/poker-deck-875295_1280.jpg)
+]
 
-## cards in the deck cannot be processed now
-
+cards in the deck cannot be processed now
 .green[
-### user input and IO are values distributed in time
+user input and IO are __values distributed in time__
 ]
 
 ]
+
+???
+
+> * 
+
+---
+
+# topics
+
+- .green[### algorithms for values distributed in time]
+- .green[### opt-in concurrency]
+- .green[### write new operators]
+- .green[### delegating task execution]
+- .green[### process batches of collected values]
+- .green[### adapt existing sources]
+
+???
+
+> * 
+
+---
+
+# algorithms for values distributed in time
+###  how not to get wet!
+
+.center[
+.image-60[
+![water balloons](content/water_balloons.gif)
+]
+]
+
+???
+
+> * 
+
+---
+
+# when
+
+- intermediate updates are desired
+- combining multiple sources
+- 
 
 ???
 
@@ -250,7 +310,7 @@ deactivate observable
 ---
 
 ```
-range(2, 2) | rxo::map([](long l){return to_string(l);} | subscribe(); 
+range(2, 2) | rxo::map([](long l){return to_string(l);}) | subscribe(); 
 ```
 
 .center[
@@ -525,6 +585,7 @@ questions?
     <script src="./MathJax/MathJax.js?config=TeX-AMS-MML_HTMLorMML&delayStartupUntil=configured" type="text/javascript" >
     </script>
     <script>
+
         var slideshow = remark.create({
             ratio: "16:9",
             highlightLanguage: "cpp",
