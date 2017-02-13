@@ -1,0 +1,30 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "0.1.0",
+    "command": "em++",
+    "args": ["-std=c++14", "--memory-init-file", "0", "-s", "ASSERTIONS=2", "-s", "DEMANGLE_SUPPORT=1", "-s", "DISABLE_EXCEPTION_CATCHING=0", "-s", "NO_EXIT_RUNTIME=1", "-s", "AGGRESSIVE_VARIABLE_ELIMINATION=1", "-s", "EXPORT_NAME=\"'ContextLib'\"", "-s", "MODULARIZE=1", "-DRX_INFO=0", "-DRX_SKIP_TESTS=0", "-DRX_SKIP_THREAD=1", "-DRX_SLOW=0", "-DRX_DEFER_IMMEDIATE=0", "-O2", "-g4", "context.cpp", "-o", "context.js"],
+    "isBuildCommand": true,
+    "isBackground": false,
+    "osx": {
+        "options": {
+            "env": {
+                "EMSCRIPTEN": "/Users/kirk/source/emsdk_portable/emscripten/1.35.0",
+                "EM_CONFIG":  "/Users/kirk/.emscripten",
+                "PATH": "/Users/kirk/source/emsdk_portable:/Users/kirk/source/emsdk_portable/clang/e1.35.0_64bit:/Users/kirk/source/emsdk_portable/node/4.1.1_64bit/bin:/Users/kirk/source/emsdk_portable/emscripten/1.35.0:/usr/local/opt/coreutils/libexec/gnubin:/Users/kirk/.rbenv/shims:/Users/kirk/.rvm/gems/ruby-2.2.0/bin:/Users/kirk/.rvm/gems/ruby-2.2.0@global/bin:/Users/kirk/.rvm/rubies/ruby-2.2.0/bin:/Users/kirk/.dnx/runtimes/dnx-mono.1.0.0-beta5/bin:/Users/kirk/.dnx/bin:/usr/local/bin:/Users/kirk/source/blink_depot_tools/:/Users/kirk/Downloads/gradle-1.12/bin/:/Users/kirk/Downloads/sbt/bin:/usr/bin:/bin:/usr/sbin:/sbin:/opt/X11/bin:/Applications/Server.app/Contents/ServerRoot/usr/bin:/Applications/Server.app/Contents/ServerRoot/usr/sbin:/usr/local/share/dotnet:/Applications/Wireshark.app/Contents/MacOS:/Users/kirk/.rvm/bin"
+            }
+        }
+    },
+    "problemMatcher": {
+        "owner": "cpp",
+        "fileLocation": ["relative", "${workspaceRoot}/rxcppv3"],
+        "pattern": {
+            "regexp": "^(.*):(\\d+):(\\d+):\\s+(warning|error):\\s+(.*)$",
+            "file": 1,
+            "line": 2,
+            "column": 3,
+            "severity": 4,
+            "message": 5
+        }
+    }
+}
