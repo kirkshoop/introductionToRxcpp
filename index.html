@@ -42,7 +42,7 @@
         }
 
         img {
-            width: 50%;
+            width: 80%;
         }
 
         table {
@@ -59,6 +59,9 @@
         th {
             border-bottom: 3px solid steelblue;
             color: black;
+        }
+        pre {
+            margin: 0.2em 0px 0.2em
         }
         
         .green {
@@ -84,6 +87,11 @@
         .split-60 .column:last-of-type {width: 40%}
         .split-70 .column:first-of-type {width: 70%}
         .split-70 .column:last-of-type {width: 30%}
+
+        .column ul:first-of-type {
+            margin: .2em
+        }
+
 
         blockquote {
             background: lightgray ;
@@ -127,7 +135,9 @@ class: middle
 
 # Introduction to ReactiveX in C++ (rxcpp)
 
-#### algorithms for values distributed in time
+.green[
+### algorithms for values distributed in time
+]
 
 ]
 
@@ -142,7 +152,9 @@ class: middle
 #### DEMO
 
 .center[
+.image-80[
 ![twitter application](content/twitter_with_word_sentiment.gif)
+]
 ]
 
 ???
@@ -154,32 +166,7 @@ class: middle
 
 ---
 
-# a bird in hand is worth two in a bush
-
----
-
-# a bird in hand is worth two in a bush
-
-.center[
-## data in the hand can be used now
-array and list are values distributed in space
-]
-
----
-
-# a bird in hand is worth two in a bush
-
-.center[
-## data in the bush cannot be used now
-user input and IO are values distributed in time
-]
-
-???
-
-> * 
----
-
-# my son says, space vs time is observed when playing cards
+# my son says: "space vs time is explained by playing cards"
 
 .center[
 .image-70[
@@ -239,9 +226,8 @@ user input and IO are __values distributed in time__
 
 - .green[### algorithms for values distributed in time]
 - .green[### opt-in concurrency]
-- .green[### write new operators]
-- .green[### delegating task execution]
-- .green[### process batches of collected values]
+- .green[### write an operator]
+- .green[### delegate task execution]
 - .green[### adapt existing sources]
 
 ???
@@ -251,7 +237,10 @@ user input and IO are __values distributed in time__
 ---
 
 # algorithms for values distributed in time
+
+.green[
 ###  how not to get wet!
+]
 
 .center[
 .image-60[
@@ -265,17 +254,8 @@ user input and IO are __values distributed in time__
 
 ---
 
-# when
-
-- intermediate updates are desired
-- combining multiple sources
-- 
-
-???
-
-> * 
-
----
+.split-60[
+.column[
 
 ```
 observable | subscribe(subscriber);
@@ -289,7 +269,6 @@ participant subscriber
 participant App
 App->> observable: subscribe(subscriber)
 activate observable
-note over observable,subscriber: calls to the subscriber must never overlap in time
 loop value
     observable -->> subscriber: on_next()
 end
@@ -303,36 +282,159 @@ deactivate observable
 ]
 ]
 
+]
+
+.column[
+
+- .green[### observables are lazy]
+- .green[### calls to the subscriber will never overlap in time]
+- .green[### on_error is the last call that a subscriber will receive]
+- .green[### on_completed is the last call that a subscriber will receive]
+- .green[### unsubscribe will cancel a subscription]
+
+]
+]
 ???
 
 > *
 
 ---
 
+# use algorithms to . . . 
+
+- .green[## collect values and process periodically]
+- .green[## provide intermediate results]
+- .green[## combine multiple sources]
+
+???
+
+> * 
+
+---
+
+# transform algorithm
+
+.green[
+`transform` calls a function with each value that arrives and passes out the result of the function.
+]
+
+<rx-marbles key="map"></rx-marbles>
+
+> `map` is a common alias for `transform`.
+
+???
+
+> * 
+
+---
+
+# transform algorithm
+
+--
+
+.split-60[
+.column[
+
 ```
-range(2, 2) | rxo::map([](long l){return to_string(l);}) | subscribe(); 
+auto map = [](auto selector){
+```
+
+]
+.column[
+
+]
+]
+
+--
+
+.split-60[
+.column[
+
+```
+  return [=](auto in){
+    return create([=](auto out){ 
+```
+
+]
+.column[
+
+- .green[an operator is a function that takes an observable and returns an observable]
+
+]
+]
+
+--
+
+.split-60[
+.column[
+
+```
+      return in 
+        | subscribe(
+          out.get_subscriber(),
+          [](auto v){
+            out.on_next(`selector(v)`);
+          },
+```
+
+]
+.column[
+
+- .green[values from `in` are transformed by `selector` and the result passed to `out`]
+
+]
+]
+
+--
+
+.split-60[
+.column[
+
+```
+          [](exception_ptr ep){out.on_error(ep);},
+          []()                {out.on_completed();}
+
+        ); }); }; };
+```
+
+]
+.column[
+
+- .green[`on_error` and `on_completed` are passed to `out` unchanged]
+
+]
+]
+
+???
+
+> * 
+
+---
+
+```
+range(2, 2) | map([](long l){return to_string(l);}) | subscribe(); 
 ```
 
 .center[
 .mermaid[
 sequenceDiagram
-participant input observable
+participant range observable
 participant map subscriber
 participant map observable
 participant App subscriber
 participant App
 App ->> map observable: subscribe(App subscriber)
 activate map observable
-map observable ->> input observable: subscribe(map subscriber)
-activate input observable
-input observable -->> map subscriber: on_next(2)
+map observable ->> range observable: subscribe(map subscriber)
+activate range observable
+range observable -->> map subscriber: on_next(2)
 map subscriber -->> App subscriber: on_next(to_string(2))
-input observable --x map subscriber: on_completed()
+range observable --x map subscriber: on_completed()
 map subscriber --x App subscriber: on_completed()
 App subscriber -->> App subscriber: unsubscribe()
 deactivate map observable
 map subscriber -->> map subscriber: unsubscribe()
-deactivate input observable
+deactivate range observable
 ]
 ]
 
@@ -346,34 +448,70 @@ deactivate input observable
 
 --
 
+.split-60[
+.column[
+
 ```
 auto tweetthread = observe_on_new_thread();
 ```
 
+]
+.column[
+
+]
+]
+
 --
+
+.split-60[
+.column[
 
 ```
 auto requesttwitterstream = defer([=](){
-    auto url = oauth2SignUrl("https://stream.twitter.com/...");
+  auto url = oauth2SignUrl("https://stream.twitter...");
 ```
+
+]
+.column[
+- .green[`defer` is used to call `oauth2SignUrl` when the request is repeated]
+]
+]
 
 ???
 
-> * defer is used to call oauth2SignUrl when the request is repeated
+> * `defer` is used to call `oauth2SignUrl` when the request is repeated
 
 --
 
+.split-60[
+.column[
+
 ```
-    return http.create(http_request{url, method, {}, {}}) |
+  return http.create(http_request{url, method, {}, {}}) |
 ```
+
+]
+.column[
+- .green[`create` an observable that will start a request when `subscribe` is called]
+]
+]
 
 --
 
+.split-60[
+.column[
+
 ```
-        rxo::map([](http_response r){
-            return r.body.chunks;
-        }) |
+    rxo::map([](http_response r){
+      return r.body.chunks;
+    }) |
 ```
+
+]
+.column[
+- .green[`chunks` is an `observable<string>` that emits parts of the body as they arrive]
+]
+]
 
 ???
 
@@ -381,19 +519,25 @@ auto requesttwitterstream = defer([=](){
 
 --
 
+.split-60[
+.column[
+
 ```
-        merge(tweetthread);
+    merge(`tweetthread`);
 }) |
+twitter_stream_reconnection(`tweetthread`);
 ```
 
---
-
-```
-twitter_stream_reconnection(tweetthread);
-```
+]
+.column[
+- .green[emit all tweets on a dedicated thread]
+- .green[`twitter_stream_reconnection` implements the twitter reconnect protocol for errors]
+]
+]
 
 ???
 
+> * emit all the tweets on the specified thread
 > * twitter_stream_reconnection - new operator to retry the request on failure
 
 ---
@@ -402,11 +546,20 @@ twitter_stream_reconnection(tweetthread);
 
 --
 
+.split-60[
+.column[
+
 ```
-auto twitter_stream_reconnection = [](observe_on_one_worker tweetthread){
+auto twitter_stream_reconnection = [](auto tweetthread){
     return [=](observable<string> chunks){
         return chunks |
 ```
+
+]
+.column[
+- .green[an operator is a function that takes an observable and returns an observable]
+]
+]
 
 ???
 
@@ -414,15 +567,27 @@ auto twitter_stream_reconnection = [](observe_on_one_worker tweetthread){
 
 --
 
+.split-60[
+.column[
+
 ```
             timeout(seconds(90), tweetthread) |
 ```
+
+]
+.column[
+- .green[first rule is to reconnect if nothing has arrived for 90s]
+]
+]
 
 ???
 
 > * error when no string has been appended to the body in 90s 
 
 --
+
+.split-60[
+.column[
 
 ```
             on_error_resume_next([=](exception_ptr ep) {
@@ -436,6 +601,14 @@ auto twitter_stream_reconnection = [](observe_on_one_worker tweetthread){
             }) |
 ```
 
+]
+.column[
+- .green[`twitterRetryAfterHttp` returns an observable that completes after a time (based on the rules)]
+- .green[`timeout_error` should reconnect now]
+- .green[unhandled errors are re-thrown]
+]
+]
+
 ???
 
 > * catches errors and returns a new observable to use
@@ -444,10 +617,19 @@ auto twitter_stream_reconnection = [](observe_on_one_worker tweetthread){
 
 --
 
+.split-60[
+.column[
+
 ```
             repeat(0);
 }; };
 ```
+
+]
+.column[
+- .green[when the stream completes, repeat the request]
+]
+]
 
 ???
 
