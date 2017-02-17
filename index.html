@@ -166,6 +166,21 @@ class: middle
 
 ---
 
+# topics
+
+- .green[### algorithms for values distributed in time]
+- .green[### write an operator]
+- .green[### virtuous procrastination]
+- .green[### opt-in concurrency]
+- .green[### delegate task execution]
+- .green[### adapt existing sources]
+
+???
+
+> * 
+
+---
+
 # my son says: "space vs time is explained by playing cards"
 
 .center[
@@ -222,20 +237,6 @@ user input and IO are __values distributed in time__
 
 ---
 
-# topics
-
-- .green[### algorithms for values distributed in time]
-- .green[### opt-in concurrency]
-- .green[### write an operator]
-- .green[### delegate task execution]
-- .green[### adapt existing sources]
-
-???
-
-> * 
-
----
-
 # algorithms for values distributed in time
 
 .green[
@@ -254,6 +255,131 @@ user input and IO are __values distributed in time__
 
 ---
 
+.split-60[
+.column[
+
+```
+observable | subscribe(subscriber);
+```
+
+]
+
+.column[
+
+- .green[demonstrate the contract of a subscription]
+
+]
+]
+
+---
+
+.split-60[
+.column[
+
+```
+observable | subscribe(subscriber);
+```
+
+.center[
+.mermaid[
+sequenceDiagram
+participant observable
+participant subscriber
+participant App
+App->> observable: subscribe(subscriber)
+activate observable
+deactivate observable
+]
+]
+
+]
+
+.column[
+
+- .green[demonstrate the contract of a subscription]
+- .green[### observables are lazy]
+
+]
+]
+
+---
+
+.split-60[
+.column[
+
+```
+observable | subscribe(subscriber);
+```
+
+.center[
+.mermaid[
+sequenceDiagram
+participant observable
+participant subscriber
+participant App
+App->> observable: subscribe(subscriber)
+activate observable
+loop value
+    observable -->> subscriber: on_next()
+end
+deactivate observable
+]
+]
+
+]
+
+.column[
+
+- .green[demonstrate the contract of a subscription]
+- .green[### observables are lazy]
+- .green[### calls to the subscriber will never overlap in time]
+
+]
+]
+
+---
+
+.split-60[
+.column[
+
+```
+observable | subscribe(subscriber);
+```
+
+.center[
+.mermaid[
+sequenceDiagram
+participant observable
+participant subscriber
+participant App
+App->> observable: subscribe(subscriber)
+activate observable
+loop value
+    observable -->> subscriber: on_next()
+end
+alt failure
+    observable --x subscriber: on_error()
+else finish
+    observable --x subscriber: on_completed()
+end
+deactivate observable
+]
+]
+
+]
+
+.column[
+
+- .green[demonstrate the contract of a subscription]
+- .green[### observables are lazy]
+- .green[### calls to the subscriber will never overlap in time]
+- .green[### on_error is the last call that a subscriber will receive]
+- .green[### on_completed is the last call that a subscriber will receive]
+
+]
+]
+
+---
 .split-60[
 .column[
 
@@ -286,6 +412,7 @@ deactivate observable
 
 .column[
 
+- .green[demonstrate the contract of a subscription]
 - .green[### observables are lazy]
 - .green[### calls to the subscriber will never overlap in time]
 - .green[### on_error is the last call that a subscriber will receive]
@@ -294,6 +421,7 @@ deactivate observable
 
 ]
 ]
+
 ???
 
 > *
@@ -302,9 +430,20 @@ deactivate observable
 
 # use algorithms to . . . 
 
-- .green[## collect values and process periodically]
-- .green[## provide intermediate results]
-- .green[## combine multiple sources]
+--
+
+- .green[
+## collect values and process periodically]
+
+--
+
+- .green[
+## provide intermediate results]
+
+--
+
+- .green[
+## combine multiple sources]
 
 ???
 
@@ -312,7 +451,17 @@ deactivate observable
 
 ---
 
-# transform algorithm
+# write an operator
+
+## man in the middle animation
+
+???
+
+> * 
+
+---
+
+# write an operator - transform algorithm
 
 .green[
 `transform` calls a function with each value that arrives and passes out the result of the function.
@@ -328,9 +477,7 @@ deactivate observable
 
 ---
 
-# transform algorithm
-
---
+# write an operator - transform algorithm
 
 .split-60[
 .column[
@@ -425,6 +572,207 @@ participant App subscriber
 participant App
 App ->> map observable: subscribe(App subscriber)
 activate map observable
+deactivate map observable
+]
+]
+
+???
+
+> *
+
+---
+
+```
+range(2, 2) | map([](long l){return to_string(l);}) | subscribe(); 
+```
+
+.center[
+.mermaid[
+sequenceDiagram
+participant range observable
+participant map subscriber
+participant map observable
+participant App subscriber
+participant App
+App ->> map observable: subscribe(App subscriber)
+activate map observable
+map observable ->> range observable: subscribe(map subscriber)
+activate range observable
+deactivate map observable
+deactivate range observable
+]
+]
+
+???
+
+> *
+
+---
+
+```
+range(2, 2) | map([](long l){return to_string(l);}) | subscribe(); 
+```
+
+.center[
+.mermaid[
+sequenceDiagram
+participant range observable
+participant map subscriber
+participant map observable
+participant App subscriber
+participant App
+App ->> map observable: subscribe(App subscriber)
+activate map observable
+map observable ->> range observable: subscribe(map subscriber)
+activate range observable
+range observable -->> map subscriber: on_next(2)
+deactivate map observable
+deactivate range observable
+]
+]
+
+???
+
+> *
+
+---
+
+```
+range(2, 2) | map([](long l){return to_string(l);}) | subscribe(); 
+```
+
+.center[
+.mermaid[
+sequenceDiagram
+participant range observable
+participant map subscriber
+participant map observable
+participant App subscriber
+participant App
+App ->> map observable: subscribe(App subscriber)
+activate map observable
+map observable ->> range observable: subscribe(map subscriber)
+activate range observable
+range observable -->> map subscriber: on_next(2)
+map subscriber -->> App subscriber: on_next(to_string(2))
+deactivate map observable
+deactivate range observable
+]
+]
+
+???
+
+> *
+
+---
+
+```
+range(2, 2) | map([](long l){return to_string(l);}) | subscribe(); 
+```
+
+.center[
+.mermaid[
+sequenceDiagram
+participant range observable
+participant map subscriber
+participant map observable
+participant App subscriber
+participant App
+App ->> map observable: subscribe(App subscriber)
+activate map observable
+map observable ->> range observable: subscribe(map subscriber)
+activate range observable
+range observable -->> map subscriber: on_next(2)
+map subscriber -->> App subscriber: on_next(to_string(2))
+range observable --x map subscriber: on_completed()
+deactivate map observable
+deactivate range observable
+]
+]
+
+???
+
+> *
+
+---
+
+```
+range(2, 2) | map([](long l){return to_string(l);}) | subscribe(); 
+```
+
+.center[
+.mermaid[
+sequenceDiagram
+participant range observable
+participant map subscriber
+participant map observable
+participant App subscriber
+participant App
+App ->> map observable: subscribe(App subscriber)
+activate map observable
+map observable ->> range observable: subscribe(map subscriber)
+activate range observable
+range observable -->> map subscriber: on_next(2)
+map subscriber -->> App subscriber: on_next(to_string(2))
+range observable --x map subscriber: on_completed()
+map subscriber --x App subscriber: on_completed()
+deactivate map observable
+deactivate range observable
+]
+]
+
+???
+
+> *
+
+---
+
+```
+range(2, 2) | map([](long l){return to_string(l);}) | subscribe(); 
+```
+
+.center[
+.mermaid[
+sequenceDiagram
+participant range observable
+participant map subscriber
+participant map observable
+participant App subscriber
+participant App
+App ->> map observable: subscribe(App subscriber)
+activate map observable
+map observable ->> range observable: subscribe(map subscriber)
+activate range observable
+range observable -->> map subscriber: on_next(2)
+map subscriber -->> App subscriber: on_next(to_string(2))
+range observable --x map subscriber: on_completed()
+map subscriber --x App subscriber: on_completed()
+App subscriber -->> App subscriber: unsubscribe()
+deactivate map observable
+deactivate range observable
+]
+]
+
+???
+
+> *
+
+---
+
+```
+range(2, 2) | map([](long l){return to_string(l);}) | subscribe(); 
+```
+
+.center[
+.mermaid[
+sequenceDiagram
+participant range observable
+participant map subscriber
+participant map observable
+participant App subscriber
+participant App
+App ->> map observable: subscribe(App subscriber)
+activate map observable
 map observable ->> range observable: subscribe(map subscriber)
 activate range observable
 range observable -->> map subscriber: on_next(2)
@@ -444,7 +792,24 @@ deactivate range observable
 
 ---
 
-# how to get a stream of tweets
+# virtuous procrastination
+
+???
+
+> * defer is virtuous procrastination as a survival trait
+> * deferral is used for observable and scheduler
+
+---
+
+# opt-in concurrency
+
+???
+
+> *
+
+---
+
+# how to get the json from stream.twitter.com 
 
 --
 
@@ -502,7 +867,7 @@ auto requesttwitterstream = defer([=](){
 .column[
 
 ```
-    rxo::map([](http_response r){
+    map([](http_response r){
       return r.body.chunks;
     }) |
 ```
@@ -531,6 +896,8 @@ twitter_stream_reconnection(`tweetthread`);
 ]
 .column[
 - .green[emit all tweets on a dedicated thread]
+
+
 - .green[`twitter_stream_reconnection` implements the twitter reconnect protocol for errors]
 ]
 ]
@@ -603,8 +970,11 @@ auto twitter_stream_reconnection = [](auto tweetthread){
 
 ]
 .column[
+
 - .green[`twitterRetryAfterHttp` returns an observable that completes after a time (based on the rules)]
+
 - .green[`timeout_error` should reconnect now]
+<br/>
 - .green[unhandled errors are re-thrown]
 ]
 ]
@@ -640,7 +1010,7 @@ auto twitter_stream_reconnection = [](auto tweetthread){
 # how to call sentiment web service
 
 ```
-auto requestsentiment = observable<>::defer([=]() {
+auto requestsentiment = defer([=]() {
 ```
 
 --
@@ -663,12 +1033,414 @@ auto requestsentiment = observable<>::defer([=]() {
 
 ```
     return http.create(http_request{url, "POST", headers, body.dump()}) |
-        rxo::map([](http_response r){
-            return r.body.complete;
+        map([](http_response r){
+            return r.body.`complete`;
         }) |
         merge(workerthread);
 });
 ```
+
+???
+
+> * 
+
+---
+
+# how to batch calls to sentiment web service
+
+--
+
+.split-60[
+.column[
+
+```
+auto sentiment = ts
+  | buffer_with_time(milliseconds(500), tweetthread)
+```
+
+]
+.column[
+- .green[
+]
+]
+]
+
+--
+
+.split-60[
+.column[
+
+```
+  | filter([](vector<Tweet> tws){ return !tws.empty(); })
+```
+
+]
+.column[
+- .green[
+]
+]
+]
+
+--
+
+.split-60[
+.column[
+
+```
+  | map([=](const vector<Tweet>& tws) {
+```
+
+]
+.column[
+- .green[
+]
+]
+]
+
+--
+
+.split-60[
+.column[
+
+```
+    vector<string> text = tws
+        | view::transform([](Tweet tw){
+            return tweettext(tw);
+        });
+```
+
+]
+.column[
+- .green[
+]
+]
+]
+
+--
+
+.split-60[
+.column[
+
+```
+    return sentimentrequest(poolthread, http, text)
+        | map([=](const string& body){
+```
+
+]
+.column[
+- .green[
+]
+]
+]
+
+--
+
+.split-60[
+.column[
+
+```
+            auto response = json::parse(body);
+            auto combined = view::zip(response, tws);
+            // . . .
+        }); });
+```
+
+]
+.column[
+- .green[
+]
+]
+]
+
+???
+
+> * 
+
+---
+
+# delegate task execution
+
+--
+
+- .green[
+## run tasks using; thread pool, event loop, actor, channel, etc..]
+
+--
+
+- .green[
+## implement a scheduler to delegate tasks]
+
+--
+
+ - `auto scheduler::now() -> time_point`
+
+--
+
+ - `auto scheduler::schedule(time_point at, schedulable what) -> void`
+
+???
+
+> * 
+
+---
+
+# delegate task execution - asio `io_service`
+
+
+???
+
+> * 
+
+---
+
+# adapt async sources
+
+--
+
+- .green[
+## callbacks]
+
+--
+
+- .green[
+## event loops]
+
+???
+
+> * 
+
+---
+
+# adapt async sources - http requests using curl
+
+--
+
+- .green[
+### `curl_multi_perform` supports multiplexing requests on a thread]
+
+--
+
+- .green[
+### all the calls to curl must be made from that thread]
+
+--
+
+- .green[
+### completion and results must be delivered to the matching request]
+
+???
+
+> * 
+
+---
+
+# adapt async sources - http requests using curl
+
+```
+auto worker = create<CURLMsg*>([](subscriber<CURLMsg*> out){
+    while(out.is_subscribed()) {
+      `curl_multi_perform`(curlm, /*. . .*/);
+      for(;;) {
+        CURLMsg *message = nullptr;
+        message = `curl_multi_info_read`(curlm, /*. . .*/);
+        out.on_next(message);
+        if (!!message /*. . .*/) { continue; }
+        break;
+      }
+      int handlecount = 0;
+      `curl_multi_wait`(curlm, nullptr, 0, 500, &handlecount);
+      if (handlecount == 0) { this_thread::sleep_for(100ms); }
+    }
+    out.on_completed();
+  }) |
+  subscribe_on(`httpthread`) |
+  publish() |
+  connect_forever();
+```
+
+???
+
+> * 
+
+---
+
+# adapt async sources - http requests using curl
+
+```
+auto worker = create<CURLMsg*>([](subscriber<CURLMsg*> out){
+    while(out.`is_subscribed`()) {
+      curl_multi_perform(curlm, /*. . .*/);
+      for(;;) {
+        CURLMsg *message = nullptr;
+        message = curl_multi_info_read(curlm, /*. . .*/);
+        out.`on_next`(message);
+        if (!!message /*. . .*/) { continue; }
+        break;
+      }
+      int handlecount = 0;
+      curl_multi_wait(curlm, nullptr, 0, 500, &handlecount);
+      if (handlecount == 0) { this_thread::sleep_for(100ms); }
+    }
+    out.`on_completed`();
+  }) |
+  subscribe_on(httpthread) |
+  publish() |
+  connect_forever();
+```
+
+???
+
+> * 
+
+---
+
+# adapt async sources - http requests using curl
+
+to create an http request, use `worker` observable to run the curl api calls on the httpthread.
+
+.split-50[
+.column[
+
+.green[
+subscribe to http request]
+
+```
+worker
+  | take(1)
+  | tap([] (CURLMsg*){
+    auto curl = curl_easy_init();
+    curl_easy_setopt(curl, 
+      CURLOPT_URL, url.c_str());
+    // . . . 
+    curl_multi_add_handle(curlm, curl);
+    //
+  })
+  | subscribe();
+```
+]
+
+.column[
+
+.green[
+unsubscribe http request (cancel)]
+
+```
+worker
+  | take(1)
+  | tap([] (CURLMsg*){
+    //
+    //
+    //
+    //
+    curl_multi_remove_handle(curlm, curl);
+    curl_easy_cleanup(curl);
+  })
+  | subscribe();
+```
+
+]
+]
+
+???
+
+> * 
+
+---
+
+# recap
+
+???
+
+> * 
+
+---
+
+# recap
+
+.green[
+## algorithms for values distributed in time]
+
+???
+
+> * 
+
+---
+
+# recap
+
+.green[
+## write an operator]
+
+???
+
+> * 
+
+---
+
+# recap
+
+.green[
+## virtuous procrastination]
+
+???
+
+> * 
+
+---
+
+# recap
+
+.green[
+## opt-in concurrency]
+
+???
+
+> * 
+
+---
+
+# recap
+
+.green[
+## delegate task execution]
+
+???
+
+> * 
+
+---
+
+# recap
+
+.green[
+## adapt existing sources]
+
+???
+
+> * 
+
+---
+
+# vistas
+
+- REST service routing library
+- http service library
+- bindings for QT (in progress)
+- bindings for asio
+- rxcpp v3
+- standardization
+- add native algoritm support to libraries 
+
+???
+
+> * 
+
+---
+
+##complete.
+questions?
+
+<rx-marbles key="concat"/>
 
 ???
 
@@ -728,15 +1500,6 @@ classDiagram
 ???
 
 > *
-
----
-
-##complete.
-questions?
-
-<rx-marbles key="concat"/>
-???
-> * 
 
     </textarea>
     <!--script src="https://gnab.github.io/remark/downloads/remark-latest.min.js" type="text/javascript" >
