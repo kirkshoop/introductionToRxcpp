@@ -69,6 +69,8 @@
         }
 
 
+        .image-30 img {width: 30%}
+        .image-40 img {width: 40%}
         .image-50 img {width: 50%}
         .image-60 img {width: 60%}
         .image-70 img {width: 70%}
@@ -169,11 +171,25 @@ class: middle
 # topics
 
 - .green[### algorithms for values distributed in time]
-- .green[### write an operator]
+- .green[### write an algorithm]
 - .green[### virtuous procrastination]
-- .green[### opt-in concurrency]
+- .green[### opt-in thread-safety]
 - .green[### delegate task execution]
 - .green[### adapt existing sources]
+
+???
+
+> * 
+
+---
+
+# algorithms for values distributed in time
+
+- .green[
+## time vs. space]
+
+- .green[
+## flow of a subscription]
 
 ???
 
@@ -237,7 +253,7 @@ user input and IO are __values distributed in time__
 
 ---
 
-# algorithms for values distributed in time
+# flow of a subscription
 
 .green[
 ###  how not to get wet!
@@ -428,40 +444,56 @@ deactivate observable
 
 ---
 
-# use algorithms to . . . 
-
---
+.split-70[
+.column[
+.image-80[
+![](content/algorithms for values distributed in time-COMPLETED-green.svg)
+]
 
 - .green[
 ## collect values and process periodically]
 
---
-
 - .green[
 ## provide intermediate results]
-
---
 
 - .green[
 ## combine multiple sources]
 
+]
+
+.column[
+.right[
+![water balloons](content/water_balloons.gif)
+
+<br/>
+<br/>
+### .green[__next >>__] write an algorithm
+]
+]
+
+]
+
 ???
 
 > * 
 
 ---
 
-# write an operator
+# write an algorithm
 
-## man in the middle animation
+.center[
+![honda rube goldberg](content/honda rube.gif)
+]
 
 ???
 
-> * 
+> * each step is an algorithm for values distributed in time
+> * a value from the previous step arrives and is transformed into a new value
+> * the new value travels in time to the next algorithm
 
 ---
 
-# write an operator - transform algorithm
+# write an algorithm - transform
 
 .green[
 `transform` calls a function with each value that arrives and passes out the result of the function.
@@ -477,7 +509,7 @@ deactivate observable
 
 ---
 
-# write an operator - transform algorithm
+# write an algorithm - transform
 
 .split-60[
 .column[
@@ -792,20 +824,55 @@ deactivate range observable
 
 ---
 
+.split-60[
+.column[
+![](content/write an algorithm-COMPLETED-green.svg)
+
+- .green[
+## created transform algorithm]
+
+- .green[
+## used transform algorithm to change values from long to string]
+
+- .green[
+## showed subscription flow through algorithm]
+
+]
+
+
+.column[
+.right[
+.image-80[
+![honda rube goldberg](content/honda rube.gif)
+]
+
+<br/>
+<br/>
+### .green[__next >>__] virtuous procrastination
+
+]
+]
+
+]
+
+???
+
+> *
+
+---
+
 # virtuous procrastination
+
+.center[
+.image-70[
+![](content/lemur on photographer.gif)
+]
+]
 
 ???
 
 > * defer is virtuous procrastination as a survival trait
 > * deferral is used for observable and scheduler
-
----
-
-# opt-in concurrency
-
-???
-
-> *
 
 ---
 
@@ -817,34 +884,19 @@ deactivate range observable
 .column[
 
 ```
-auto tweetthread = observe_on_new_thread();
-```
-
-]
-.column[
-
-]
-]
-
---
-
-.split-60[
-.column[
-
-```
-auto requesttwitterstream = defer([=](){
+auto requesttwitterstream = `defer`([=](){
   auto url = oauth2SignUrl("https://stream.twitter...");
 ```
 
 ]
 .column[
-- .green[`defer` is used to call `oauth2SignUrl` when the request is repeated]
+- .green[`defer` is used to call `oauth2SignUrl` each time the request is repeated]
 ]
 ]
 
 ???
 
-> * `defer` is used to call `oauth2SignUrl` when the request is repeated
+> * `defer` is used to call `oauth2SignUrl` each time the request is repeated
 
 --
 
@@ -888,9 +940,9 @@ auto requesttwitterstream = defer([=](){
 .column[
 
 ```
-    merge(`tweetthread`);
+    merge(tweetthread);
 }) |
-twitter_stream_reconnection(`tweetthread`);
+twitter_stream_reconnection(tweetthread);
 ```
 
 ]
@@ -991,7 +1043,7 @@ auto twitter_stream_reconnection = [](auto tweetthread){
 .column[
 
 ```
-            repeat(0);
+            repeat();
 }; };
 ```
 
@@ -1007,7 +1059,63 @@ auto twitter_stream_reconnection = [](auto tweetthread){
 
 ---
 
+.split-60[
+.column[
+![](content/virtuous procrastination-COMPLETED-green.svg)
+
+.green[
+## __defer__ work]
+
+.green[
+## so that work can be..]
+
+* .green[
+## __repeated__]
+
+* .green[
+## __retried__]
+
+* .green[
+## __shared__]
+
+]
+
+.column[
+.right[
+.image-80[
+![](content/lemur on photographer.gif)
+]
+
+<br/>
+<br/>
+### .green[__next >>__] opt-in thread-safety
+
+]
+]
+
+]
+
+???
+
+---
+
+# opt-in thread-safety
+
+.center[
+.image-60[
+![](content/snl conductor.gif)
+]
+]
+
+???
+
+> * 
+
+---
+
 # how to call sentiment web service
+
+--
 
 ```
 auto requestsentiment = defer([=]() {
@@ -1036,7 +1144,7 @@ auto requestsentiment = defer([=]() {
         map([](http_response r){
             return r.body.`complete`;
         }) |
-        merge(workerthread);
+        `merge(poolthread)`;
 });
 ```
 
@@ -1055,13 +1163,13 @@ auto requestsentiment = defer([=]() {
 
 ```
 auto sentiment = ts
-  | buffer_with_time(milliseconds(500), tweetthread)
+  | buffer_with_time(500ms, tweetthread)
 ```
 
 ]
 .column[
 - .green[
-]
+buffer tweets into a vector and emit the vector every 500ms]
 ]
 ]
 
@@ -1072,28 +1180,12 @@ auto sentiment = ts
 
 ```
   | filter([](vector<Tweet> tws){ return !tws.empty(); })
-```
-
-]
-.column[
-- .green[
-]
-]
-]
-
---
-
-.split-60[
-.column[
-
-```
   | map([=](const vector<Tweet>& tws) {
 ```
 
 ]
 .column[
-- .green[
-]
+- .green[ignore empty vectors]
 ]
 ]
 
@@ -1112,7 +1204,7 @@ auto sentiment = ts
 ]
 .column[
 - .green[
-]
+__range-v3__ is used to extract a vector of strings from the json]
 ]
 ]
 
@@ -1128,8 +1220,7 @@ auto sentiment = ts
 
 ]
 .column[
-- .green[
-]
+- .green[send the vector to get a vector of the sentiment of each]
 ]
 ]
 
@@ -1147,9 +1238,44 @@ auto sentiment = ts
 
 ]
 .column[
+- .green[parse the sentiment vector from the json]
 - .green[
+__range-v3__ zips the tweet and sentiment vectors to match the tweet with the sentiment]
 ]
 ]
+
+???
+
+> * 
+
+---
+
+.split-60[
+.column[
+![](content/opt--in thread--safety-COMPLETED-green.svg)
+
+- .green[
+## default to non-thread-safe scheduler]
+
+- .green[
+## specify thread-safe schedulers to coordinate __multiple__ streams]
+
+- .green[
+## specify thread-safe schedulers to coordinate __time__ with streams]
+
+]
+
+.column[
+.right[
+![](content/snl conductor.gif)
+
+<br/>
+<br/>
+### .green[__next >>__] delegate task execution
+
+]
+]
+
 ]
 
 ???
@@ -1160,23 +1286,11 @@ auto sentiment = ts
 
 # delegate task execution
 
---
-
-- .green[
-## run tasks using; thread pool, event loop, actor, channel, etc..]
-
---
-
-- .green[
-## implement a scheduler to delegate tasks]
-
---
-
- - `auto scheduler::now() -> time_point`
-
---
-
- - `auto scheduler::schedule(time_point at, schedulable what) -> void`
+.center[
+.image-70[
+![](content/fetch newspaper.gif)
+]
+]
 
 ???
 
@@ -1186,32 +1300,185 @@ auto sentiment = ts
 
 # delegate task execution - asio `io_service`
 
+[https://github.com/pudae/example/blob/master/rx_test/rxasio/io_service.hpp](https://github.com/pudae/example/blob/master/rx_test/rxasio/io_service.hpp)
+
+```
+class io_service : public scheduler_interface
+{
+  asio::io_service& io_service_;
+
+  class strand_worker : public worker_interface;
+
+public:
+  explicit io_service(asio::io_service& io_service);
+
+  virtual clock_type::time_point now() const {
+    return `clock_type::now`();
+  }
+
+  virtual worker create_worker(composite_subscription cs) const {
+    return worker(move(cs), make_shared<`strand_worker`>(io_service_));
+  }
+};
+```
+
+???
+
+> * factory for strand_worker
+> * use real time of underlying clock
+
+---
+
+# delegate task execution - asio `io_service`
+
+[https://github.com/pudae/example/blob/master/rx_test/rxasio/io_service.hpp](https://github.com/pudae/example/blob/master/rx_test/rxasio/io_service.hpp)
+
+.split-60[
+.column[
+```
+class strand_worker : public worker_interface
+{
+    mutable asio::strand strand_;
+
+public:
+    explicit strand_worker(asio::io_service& io_service);
+
+    virtual clock_type::time_point now() const {
+        return `clock_type::now`();
+    }
+
+    virtual void schedule(const schedulable& scbl) const;
+
+    virtual void schedule(clock_type::time_point when,
+                          const schedulable& scbl) const;
+};
+```
+]
+
+.column[
+- .green[
+### a worker must ensure that only one schedulable is called at a time]
+
+- .green[
+### this worker uses asio::strand to order the calls]
+
+- .green[
+### this worker uses real time for now()]
+
+]
+
+]
+???
+
+> *
+
+---
+
+# delegate task execution - asio `io_service`
+
+[https://github.com/pudae/example/blob/master/rx_test/rxasio/io_service.hpp](https://github.com/pudae/example/blob/master/rx_test/rxasio/io_service.hpp)
+
+```
+virtual void schedule(const schedulable& scbl) const {
+  if (!scbl.is_subscribed()) return;
+
+  strand_.`post`([scbl] {
+    if (scbl.`is_subscribed`()) {
+      `scbl`();
+    }
+  });
+}
+```
+
+???
+
+> *
+
+---
+
+# delegate task execution - asio `io_service`
+
+[https://github.com/pudae/example/blob/master/rx_test/rxasio/io_service.hpp](https://github.com/pudae/example/blob/master/rx_test/rxasio/io_service.hpp)
+
+```
+virtual void schedule(clock_type::time_point when,
+                      const schedulable& scbl) const {
+  if (!scbl.is_subscribed()) return;
+
+  auto diff_ms = duration_cast<milliseconds>(when - now());
+  auto timer = make_shared<asio::`deadline_timer`>(strand_.get_io_service());
+  
+  timer->expires_from_now(diff_ms);
+
+  timer->`async_wait`(strand_.wrap([timer, scbl](const system::error_code& ec) {
+    if (!ec && scbl.`is_subscribed`())
+    {
+      `scbl`();
+    }
+  }));
+}
+```
 
 ???
 
 > * 
 
 ---
+
+.split-60[
+.column[
+
+![](content/delegate task execution-COMPLETED-green.svg)
+
+- .green[
+## run tasks using; thread pool, event loop, actor, channel, etc..]
+
+- .green[
+## implement a scheduler to delegate tasks]
+
+```
+    auto now() -> time_point;
+```
+```
+    auto schedule(schedulable what) -> void;
+```
+```
+    auto schedule(time_point at, 
+                  schedulable what) -> void;
+```
+
+]
+
+.column[
+.right[
+![](content/fetch newspaper.gif)
+
+<br/>
+<br/>
+### .green[__next >>__] adapt async sources
+
+]
+]
+
+]
+
+???
+
+> * 
+
+---
+
+background-image: url(content/drop%20cam.gif)
 
 # adapt async sources
 
---
-
-- .green[
-## callbacks]
-
---
-
-- .green[
-## event loops]
-
 ???
 
 > * 
 
 ---
 
-# adapt async sources - http requests using curl
+# adapt async sources - http requests using libcurl
 
 --
 
@@ -1234,7 +1501,7 @@ auto sentiment = ts
 
 ---
 
-# adapt async sources - http requests using curl
+# adapt async sources - http requests using libcurl
 
 ```
 auto worker = create<CURLMsg*>([](subscriber<CURLMsg*> out){
@@ -1264,7 +1531,7 @@ auto worker = create<CURLMsg*>([](subscriber<CURLMsg*> out){
 
 ---
 
-# adapt async sources - http requests using curl
+# adapt async sources - http requests using libcurl
 
 ```
 auto worker = create<CURLMsg*>([](subscriber<CURLMsg*> out){
@@ -1294,7 +1561,7 @@ auto worker = create<CURLMsg*>([](subscriber<CURLMsg*> out){
 
 ---
 
-# adapt async sources - http requests using curl
+# adapt async sources - http requests using libcurl
 
 to create an http request, use `worker` observable to run the curl api calls on the httpthread.
 
@@ -1347,6 +1614,43 @@ worker
 
 ---
 
+.split-60[
+.column[
+
+![](content/adapt async sources-COMPLETED-green.svg)
+
+- .green[
+## adapted libcurl to rxcpp]
+
+- .green[
+## libcurl uses an event loop pattern]
+
+- .green[
+## callback pattern can also be adapted to rxcpp]
+
+]
+
+.column[
+.right[
+.image-50[
+![](content/drop cam.gif)
+]
+
+<br/>
+<br/>
+### .green[__next >>__] recap
+
+]
+]
+
+]
+
+???
+
+> * 
+
+---
+
 # recap
 
 ???
@@ -1360,6 +1664,12 @@ worker
 .green[
 ## algorithms for values distributed in time]
 
+.center[
+.image-60[
+![](content/water_balloons.gif)
+]
+]
+
 ???
 
 > * 
@@ -1369,7 +1679,13 @@ worker
 # recap
 
 .green[
-## write an operator]
+## write an algorithm]
+
+.center[
+.image-60[
+![](content/honda rube.gif)
+]
+]
 
 ???
 
@@ -1382,6 +1698,12 @@ worker
 .green[
 ## virtuous procrastination]
 
+.center[
+.image-60[
+![](content/lemur on photographer.gif)
+]
+]
+
 ???
 
 > * 
@@ -1391,7 +1713,13 @@ worker
 # recap
 
 .green[
-## opt-in concurrency]
+## opt-in thread-safety]
+
+.center[
+.image-60[
+![](content/snl conductor.gif)
+]
+]
 
 ???
 
@@ -1404,11 +1732,18 @@ worker
 .green[
 ## delegate task execution]
 
+.center[
+.image-50[
+![](content/fetch newspaper.gif)
+]
+]
+
 ???
 
 > * 
 
 ---
+background-image: url(content/drop%20cam.gif)
 
 # recap
 
@@ -1421,15 +1756,51 @@ worker
 
 ---
 
-# vistas
+# things I desire
 
-- REST service routing library
-- http service library
-- bindings for QT (in progress)
-- bindings for asio
-- rxcpp v3
-- standardization
-- add native algoritm support to libraries 
+- .green[
+REST service routing library]
+- .green[
+http service library]
+- .green[
+bindings for ux libraries, like [https://github.com/tetsurom/rxqt](https://github.com/tetsurom/rxqt)]
+- .green[
+bindings for asio, like [https://github.com/pudae/example](https://github.com/pudae/example)]
+- .green[
+rxcpp v3 [https://github.com/kirkshoop/rxcppv3](https://github.com/kirkshoop/rxcppv3)]
+- .green[
+standardization]
+- .green[
+add native algoritm support to libraries]
+
+???
+
+> * 
+
+---
+
+## credits
+
+.green[__Eric Mittelette__] shaped this presentation from start to finish. I am deeply grateful for all his time and effort.
+
+.green[__Aaron Lahman__] made the first prototype of rxcpp.
+
+many others...
+
+## resources
+
+- .green[
+[https://github.com/kirkshoop/twitter](https://github.com/kirkshoop/twitter)]
+- .green[
+[https://github.com/Reactive-Extensions/RxCpp](https://github.com/Reactive-Extensions/RxCpp)]
+- .green[
+[http://reactive-extensions.github.io/RxCpp/](http://reactive-extensions.github.io/RxCpp/)]
+- .green[
+[https://github.com/kirkshoop/rxcppv3](https://github.com/kirkshoop/rxcppv3)]
+- .green[
+[http://rxmarbles.com/](http://rxmarbles.com/)]
+- .green[
+[http://reactivex.io/intro.html](http://reactivex.io/intro.html)]
 
 ???
 
@@ -1441,6 +1812,14 @@ worker
 questions?
 
 <rx-marbles key="concat"/>
+
+???
+
+> * 
+
+---
+
+# appendix
 
 ???
 
@@ -1500,6 +1879,7 @@ classDiagram
 ???
 
 > *
+
 
     </textarea>
     <!--script src="https://gnab.github.io/remark/downloads/remark-latest.min.js" type="text/javascript" >
