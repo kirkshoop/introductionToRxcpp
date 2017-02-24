@@ -64,7 +64,7 @@
             margin: 0.2em 0px 0.2em
         }
         
-        .green {
+        .accent {
             color: seagreen
         }
 
@@ -137,7 +137,7 @@ class: middle
 
 # Introduction to ReactiveX in C++ (rxcpp)
 
-.green[
+.accent[
 ### algorithms for values distributed in time
 ]
 
@@ -170,12 +170,12 @@ class: middle
 
 # topics
 
-- .green[### algorithms for values distributed in time]
-- .green[### write an algorithm]
-- .green[### virtuous procrastination]
-- .green[### opt-in thread-safety]
-- .green[### delegate task execution]
-- .green[### adapt existing sources]
+- .accent[### algorithms for values distributed in time]
+- .accent[### write an algorithm]
+- .accent[### virtuous procrastination]
+- .accent[### opt-in thread-safety]
+- .accent[### delegate task execution]
+- .accent[### adapt existing sources]
 
 ???
 
@@ -185,10 +185,10 @@ class: middle
 
 # algorithms for values distributed in time
 
-- .green[
+- .accent[
 ## time vs. space]
 
-- .green[
+- .accent[
 ## flow of a subscription]
 
 ???
@@ -220,7 +220,7 @@ class: middle
 ]
 
 cards in the hand can be processed now
-.green[
+.accent[
 array and list are __values distributed in space__
 ]
 
@@ -241,7 +241,7 @@ array and list are __values distributed in space__
 ]
 
 cards in the deck cannot be processed now
-.green[
+.accent[
 user input and IO are __values distributed in time__
 ]
 
@@ -255,7 +255,7 @@ user input and IO are __values distributed in time__
 
 # flow of a subscription
 
-.green[
+.accent[
 ###  how not to get wet!
 ]
 
@@ -282,7 +282,7 @@ observable | subscribe(subscriber);
 
 .column[
 
-- .green[demonstrate the contract of a subscription]
+- .accent[demonstrate the contract of a subscription]
 
 ]
 ]
@@ -312,8 +312,8 @@ deactivate observable
 
 .column[
 
-- .green[demonstrate the contract of a subscription]
-- .green[### observables are lazy]
+- .accent[demonstrate the contract of a subscription]
+- .accent[### observables are lazy]
 
 ]
 ]
@@ -346,9 +346,9 @@ deactivate observable
 
 .column[
 
-- .green[demonstrate the contract of a subscription]
-- .green[### observables are lazy]
-- .green[### calls to the subscriber will never overlap in time]
+- .accent[demonstrate the contract of a subscription]
+- .accent[### observables are lazy]
+- .accent[### calls to the subscriber will never overlap in time]
 
 ]
 ]
@@ -386,11 +386,11 @@ deactivate observable
 
 .column[
 
-- .green[demonstrate the contract of a subscription]
-- .green[### observables are lazy]
-- .green[### calls to the subscriber will never overlap in time]
-- .green[### on_error is the last call that a subscriber will receive]
-- .green[### on_completed is the last call that a subscriber will receive]
+- .accent[demonstrate the contract of a subscription]
+- .accent[### observables are lazy]
+- .accent[### calls to the subscriber will never overlap in time]
+- .accent[### on_error is the last call that a subscriber will receive]
+- .accent[### on_completed is the last call that a subscriber will receive]
 
 ]
 ]
@@ -428,12 +428,12 @@ deactivate observable
 
 .column[
 
-- .green[demonstrate the contract of a subscription]
-- .green[### observables are lazy]
-- .green[### calls to the subscriber will never overlap in time]
-- .green[### on_error is the last call that a subscriber will receive]
-- .green[### on_completed is the last call that a subscriber will receive]
-- .green[### unsubscribe will cancel a subscription]
+- .accent[demonstrate the contract of a subscription]
+- .accent[### observables are lazy]
+- .accent[### calls to the subscriber will never overlap in time]
+- .accent[### on_error is the last call that a subscriber will receive]
+- .accent[### on_completed is the last call that a subscriber will receive]
+- .accent[### unsubscribe will cancel a subscription]
 
 ]
 ]
@@ -450,13 +450,13 @@ deactivate observable
 ![](content/algorithms for values distributed in time-COMPLETED-green.svg)
 ]
 
-- .green[
+- .accent[
 ## collect values and process periodically]
 
-- .green[
+- .accent[
 ## provide intermediate results]
 
-- .green[
+- .accent[
 ## combine multiple sources]
 
 ]
@@ -467,7 +467,7 @@ deactivate observable
 
 <br/>
 <br/>
-### .green[__next >>__] write an algorithm
+### .accent[__next >>__] write an algorithm
 ]
 ]
 
@@ -495,7 +495,7 @@ deactivate observable
 
 # write an algorithm - transform
 
-.green[
+.accent[
 `transform` calls a function with each value that arrives and passes out the result of the function.
 ]
 
@@ -537,7 +537,7 @@ auto map = [](auto selector){
 ]
 .column[
 
-- .green[an operator is a function that takes an observable and returns an observable]
+- .accent[an operator is a function that takes an observable and returns an observable]
 
 ]
 ]
@@ -559,7 +559,7 @@ auto map = [](auto selector){
 ]
 .column[
 
-- .green[values from `in` are transformed by `selector` and the result passed to `out`]
+- .accent[values from `in` are transformed by `selector` and the result passed to `out`]
 
 ]
 ]
@@ -579,7 +579,7 @@ auto map = [](auto selector){
 ]
 .column[
 
-- .green[`on_error` and `on_completed` are passed to `out` unchanged]
+- .accent[`on_error` and `on_completed` are passed to `out` unchanged]
 
 ]
 ]
@@ -828,13 +828,13 @@ deactivate range observable
 .column[
 ![](content/write an algorithm-COMPLETED-green.svg)
 
-- .green[
+- .accent[
 ## created transform algorithm]
 
-- .green[
+- .accent[
 ## used transform algorithm to change values from long to string]
 
-- .green[
+- .accent[
 ## showed subscription flow through algorithm]
 
 ]
@@ -848,7 +848,7 @@ deactivate range observable
 
 <br/>
 <br/>
-### .green[__next >>__] virtuous procrastination
+### .accent[__next >>__] virtuous procrastination
 
 ]
 ]
@@ -890,7 +890,7 @@ auto requesttwitterstream = `defer`([=](){
 
 ]
 .column[
-- .green[`defer` is used to call `oauth2SignUrl` each time the request is repeated]
+- .accent[`defer` is used to call `oauth2SignUrl` each time the request is repeated]
 ]
 ]
 
@@ -909,7 +909,7 @@ auto requesttwitterstream = `defer`([=](){
 
 ]
 .column[
-- .green[`create` an observable that will start a request when `subscribe` is called]
+- .accent[`create` an observable that will start a request when `subscribe` is called]
 ]
 ]
 
@@ -926,7 +926,7 @@ auto requesttwitterstream = `defer`([=](){
 
 ]
 .column[
-- .green[`chunks` is an `observable<string>` that emits parts of the body as they arrive]
+- .accent[`chunks` is an `observable<string>` that emits parts of the body as they arrive]
 ]
 ]
 
@@ -947,10 +947,10 @@ twitter_stream_reconnection(tweetthread);
 
 ]
 .column[
-- .green[emit all tweets on a dedicated thread]
+- .accent[emit all tweets on a dedicated thread]
 
 
-- .green[`twitter_stream_reconnection` implements the twitter reconnect protocol for errors]
+- .accent[`twitter_stream_reconnection` implements the twitter reconnect protocol for errors]
 ]
 ]
 
@@ -976,7 +976,7 @@ auto twitter_stream_reconnection = [](auto tweetthread){
 
 ]
 .column[
-- .green[an operator is a function that takes an observable and returns an observable]
+- .accent[an operator is a function that takes an observable and returns an observable]
 ]
 ]
 
@@ -995,7 +995,7 @@ auto twitter_stream_reconnection = [](auto tweetthread){
 
 ]
 .column[
-- .green[first rule is to reconnect if nothing has arrived for 90s]
+- .accent[first rule is to reconnect if nothing has arrived for 90s]
 ]
 ]
 
@@ -1023,11 +1023,11 @@ auto twitter_stream_reconnection = [](auto tweetthread){
 ]
 .column[
 
-- .green[`twitterRetryAfterHttp` returns an observable that completes after a time (based on the rules)]
+- .accent[`twitterRetryAfterHttp` returns an observable that completes after a time (based on the rules)]
 
-- .green[`timeout_error` should reconnect now]
+- .accent[`timeout_error` should reconnect now]
 <br/>
-- .green[unhandled errors are re-thrown]
+- .accent[unhandled errors are re-thrown]
 ]
 ]
 
@@ -1049,7 +1049,7 @@ auto twitter_stream_reconnection = [](auto tweetthread){
 
 ]
 .column[
-- .green[when the stream completes, repeat the request]
+- .accent[when the stream completes, repeat the request]
 ]
 ]
 
@@ -1063,19 +1063,19 @@ auto twitter_stream_reconnection = [](auto tweetthread){
 .column[
 ![](content/virtuous procrastination-COMPLETED-green.svg)
 
-.green[
+.accent[
 ## __defer__ work]
 
-.green[
+.accent[
 ## so that work can be..]
 
-* .green[
+* .accent[
 ## __repeated__]
 
-* .green[
+* .accent[
 ## __retried__]
 
-* .green[
+* .accent[
 ## __shared__]
 
 ]
@@ -1088,7 +1088,7 @@ auto twitter_stream_reconnection = [](auto tweetthread){
 
 <br/>
 <br/>
-### .green[__next >>__] opt-in thread-safety
+### .accent[__next >>__] opt-in thread-safety
 
 ]
 ]
@@ -1168,7 +1168,7 @@ auto sentiment = ts
 
 ]
 .column[
-- .green[
+- .accent[
 buffer tweets into a vector and emit the vector every 500ms]
 ]
 ]
@@ -1185,7 +1185,7 @@ buffer tweets into a vector and emit the vector every 500ms]
 
 ]
 .column[
-- .green[ignore empty vectors]
+- .accent[ignore empty vectors]
 ]
 ]
 
@@ -1203,7 +1203,7 @@ buffer tweets into a vector and emit the vector every 500ms]
 
 ]
 .column[
-- .green[
+- .accent[
 __range-v3__ is used to extract a vector of strings from the json]
 ]
 ]
@@ -1220,7 +1220,7 @@ __range-v3__ is used to extract a vector of strings from the json]
 
 ]
 .column[
-- .green[send the vector to get a vector of the sentiment of each]
+- .accent[send the vector to get a vector of the sentiment of each]
 ]
 ]
 
@@ -1238,8 +1238,8 @@ __range-v3__ is used to extract a vector of strings from the json]
 
 ]
 .column[
-- .green[parse the sentiment vector from the json]
-- .green[
+- .accent[parse the sentiment vector from the json]
+- .accent[
 __range-v3__ zips the tweet and sentiment vectors to match the tweet with the sentiment]
 ]
 ]
@@ -1254,13 +1254,13 @@ __range-v3__ zips the tweet and sentiment vectors to match the tweet with the se
 .column[
 ![](content/opt--in thread--safety-COMPLETED-green.svg)
 
-- .green[
+- .accent[
 ## default to non-thread-safe scheduler]
 
-- .green[
+- .accent[
 ## specify thread-safe schedulers to coordinate __multiple__ streams]
 
-- .green[
+- .accent[
 ## specify thread-safe schedulers to coordinate __time__ with streams]
 
 ]
@@ -1271,7 +1271,7 @@ __range-v3__ zips the tweet and sentiment vectors to match the tweet with the se
 
 <br/>
 <br/>
-### .green[__next >>__] delegate task execution
+### .accent[__next >>__] delegate task execution
 
 ]
 ]
@@ -1356,13 +1356,13 @@ public:
 ]
 
 .column[
-- .green[
+- .accent[
 ### a worker must ensure that only one schedulable is called at a time]
 
-- .green[
+- .accent[
 ### this worker uses asio::strand to order the calls]
 
-- .green[
+- .accent[
 ### this worker uses real time for now()]
 
 ]
@@ -1430,10 +1430,10 @@ virtual void schedule(clock_type::time_point when,
 
 ![](content/delegate task execution-COMPLETED-green.svg)
 
-- .green[
+- .accent[
 ## run tasks using; thread pool, event loop, actor, channel, etc..]
 
-- .green[
+- .accent[
 ## implement a scheduler to delegate tasks]
 
 ```
@@ -1455,7 +1455,7 @@ virtual void schedule(clock_type::time_point when,
 
 <br/>
 <br/>
-### .green[__next >>__] adapt async sources
+### .accent[__next >>__] adapt async sources
 
 ]
 ]
@@ -1482,17 +1482,17 @@ background-image: url(content/drop%20cam.gif)
 
 --
 
-- .green[
+- .accent[
 ### `curl_multi_perform` supports multiplexing requests on a thread]
 
 --
 
-- .green[
+- .accent[
 ### all the calls to curl must be made from that thread]
 
 --
 
-- .green[
+- .accent[
 ### completion and results must be delivered to the matching request]
 
 ???
@@ -1568,7 +1568,7 @@ to create an http request, use `worker` observable to run the curl api calls on 
 .split-50[
 .column[
 
-.green[
+.accent[
 subscribe to http request]
 
 ```
@@ -1588,7 +1588,7 @@ worker
 
 .column[
 
-.green[
+.accent[
 unsubscribe http request (cancel)]
 
 ```
@@ -1619,13 +1619,13 @@ worker
 
 ![](content/adapt async sources-COMPLETED-green.svg)
 
-- .green[
+- .accent[
 ## adapted libcurl to rxcpp]
 
-- .green[
+- .accent[
 ## libcurl uses an event loop pattern]
 
-- .green[
+- .accent[
 ## callback pattern can also be adapted to rxcpp]
 
 ]
@@ -1638,7 +1638,7 @@ worker
 
 <br/>
 <br/>
-### .green[__next >>__] recap
+### .accent[__next >>__] recap
 
 ]
 ]
@@ -1661,7 +1661,7 @@ worker
 
 # recap
 
-.green[
+.accent[
 ## algorithms for values distributed in time]
 
 .center[
@@ -1678,7 +1678,7 @@ worker
 
 # recap
 
-.green[
+.accent[
 ## write an algorithm]
 
 .center[
@@ -1695,7 +1695,7 @@ worker
 
 # recap
 
-.green[
+.accent[
 ## virtuous procrastination]
 
 .center[
@@ -1712,7 +1712,7 @@ worker
 
 # recap
 
-.green[
+.accent[
 ## opt-in thread-safety]
 
 .center[
@@ -1729,7 +1729,7 @@ worker
 
 # recap
 
-.green[
+.accent[
 ## delegate task execution]
 
 .center[
@@ -1747,7 +1747,7 @@ background-image: url(content/drop%20cam.gif)
 
 # recap
 
-.green[
+.accent[
 ## adapt existing sources]
 
 ???
@@ -1758,20 +1758,20 @@ background-image: url(content/drop%20cam.gif)
 
 # things I desire
 
-- .green[
-REST service routing library]
-- .green[
+- .accent[
+REST service library]
+- .accent[
 http service library]
-- .green[
+- .accent[
 bindings for ux libraries, like [https://github.com/tetsurom/rxqt](https://github.com/tetsurom/rxqt)]
-- .green[
+- .accent[
 bindings for asio, like [https://github.com/pudae/example](https://github.com/pudae/example)]
-- .green[
+- .accent[
 rxcpp v3 [https://github.com/kirkshoop/rxcppv3](https://github.com/kirkshoop/rxcppv3)]
-- .green[
+- .accent[
 standardization]
-- .green[
-add native algoritm support to libraries]
+- .accent[
+native algorithm support in libraries (asio, boost, poco, etc..)]
 
 ???
 
@@ -1779,28 +1779,39 @@ add native algoritm support to libraries]
 
 ---
 
+.split-40[
+.column[
+
 ## credits
 
-.green[__Eric Mittelette__] shaped this presentation from start to finish. I am deeply grateful for all his time and effort.
+.accent[__Eric Mittelette__] shaped this presentation from start to finish. I am deeply grateful for all his time and effort.
 
-.green[__Aaron Lahman__] made the first prototype of rxcpp.
+.accent[__Aaron Lahman__] made the first prototype of rxcpp.
 
-many others...
+.accent[__Grigoriy Chudnov__, __Valery Kopylov__] and many other contributors..
+
+]
+
+
+.column[
 
 ## resources
 
-- .green[
+- .accent[
 [https://github.com/kirkshoop/twitter](https://github.com/kirkshoop/twitter)]
-- .green[
+- .accent[
 [https://github.com/Reactive-Extensions/RxCpp](https://github.com/Reactive-Extensions/RxCpp)]
-- .green[
+- .accent[
 [http://reactive-extensions.github.io/RxCpp/](http://reactive-extensions.github.io/RxCpp/)]
-- .green[
+- .accent[
 [https://github.com/kirkshoop/rxcppv3](https://github.com/kirkshoop/rxcppv3)]
-- .green[
+- .accent[
 [http://rxmarbles.com/](http://rxmarbles.com/)]
-- .green[
+- .accent[
 [http://reactivex.io/intro.html](http://reactivex.io/intro.html)]
+
+]
+]
 
 ???
 
