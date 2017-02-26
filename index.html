@@ -170,7 +170,7 @@ class: middle
 
 # topics
 
-- .accent[### algorithms for values distributed in time]
+- .accent[### values distributed in time]
 - .accent[### write an algorithm]
 - .accent[### virtuous procrastination]
 - .accent[### opt-in thread-safety]
@@ -183,13 +183,16 @@ class: middle
 
 ---
 
-# algorithms for values distributed in time
+# values distributed in time
 
 - .accent[
 ## time vs. space]
 
 - .accent[
 ## flow of a subscription]
+
+- .accent[
+## when to apply]
 
 ???
 
@@ -250,6 +253,19 @@ user input and IO are __values distributed in time__
 ???
 
 > * 
+
+---
+
+# values distributed in time
+
+.accent[
+### marble diagrams are used to describe values distributed in time.]
+
+<rx-marbles key="skipUntil"></rx-marbles>
+
+???
+
+> *
 
 ---
 
@@ -375,7 +391,7 @@ loop value
 end
 alt failure
     observable --x subscriber: on_error()
-else finish
+else completion
     observable --x subscriber: on_completed()
 end
 deactivate observable
@@ -416,7 +432,7 @@ loop value
 end
 alt failure
     observable --x subscriber: on_error()
-else finish
+else completion
     observable --x subscriber: on_completed()
 end
 subscriber -->> subscriber: unsubscribe()
@@ -444,25 +460,46 @@ deactivate observable
 
 ---
 
+# values distributed in time
+
+.accent[
+## subcriptions are useful to..]
+
+- .accent[
+### collect values and process periodically]
+
+- .accent[
+### provide intermediate results]
+
+- .accent[
+### combine values from multiple sources]
+
+???
+
+> *
+
+---
+
 .split-70[
 .column[
 .image-80[
-![](content/algorithms for values distributed in time-COMPLETED-green.svg)
+![](content/values distributed in time-COMPLETED-green.svg)
 ]
 
 - .accent[
-## collect values and process periodically]
+## demonstrated values distributed in time]
 
 - .accent[
-## provide intermediate results]
+## described flow of a subscription]
 
 - .accent[
-## combine multiple sources]
+## explained when to use]
 
 ]
 
 .column[
 .right[
+![poker game](content/poker-gremlin.gif)
 ![water balloons](content/water_balloons.gif)
 
 <br/>
@@ -593,6 +630,8 @@ auto map = [](auto selector){
 ```
 range(2, 2) | map([](long l){return to_string(l);}) | subscribe(); 
 ```
+
+--
 
 .center[
 .mermaid[
@@ -990,7 +1029,7 @@ auto twitter_stream_reconnection = [](auto tweetthread){
 .column[
 
 ```
-            timeout(seconds(90), tweetthread) |
+            `timeout`(seconds(90), tweetthread) |
 ```
 
 ]
@@ -1014,7 +1053,7 @@ auto twitter_stream_reconnection = [](auto tweetthread){
                 } catch (const http_exception& ex) {
                     return twitterRetryAfterHttp(ex);
                 } catch (const timeout_error& ex) {
-                    return empty<string>();
+                    return `empty<string>()`;
                 }
                 return error<string>(ep, tweetthread);
             }) |
@@ -1113,40 +1152,83 @@ auto twitter_stream_reconnection = [](auto tweetthread){
 
 ---
 
-# how to call sentiment web service
+# how to write a twitter app
 
 --
 
+.split-60[
+.column[
 ```
-auto requestsentiment = defer([=]() {
+auto tweets = twitterrequest(`tweetthread`, http) |
+  parsetweets(`poolthread`, `tweetthread`) |
+  publish() | ref_count(); // share
 ```
+]
+
+.column[
+* .accent[
+request and parse tweets]
+* .accent[
+share parsed tweets]
+]
+]
 
 --
 
+.split-60[
+.column[
 ```
-    std::map<string, string> headers;
-    headers["Content-Type"] = "application/json";
-    headers["Authorization"] = "Bearer " + key;
+auto models = iterate(actions /*, `currentthread`*/) |
+  merge(`mainthread`)|
+  scan(Model{}, [=](Model& m, auto f){
+    auto r = f(m);
+    return r;
+  }) | 
 ```
+]
+
+.column[
+* .accent[
+actions - process tweets into model updates]
+* .accent[
+run actions on mainthread]
+]
+]
 
 --
 
+.split-60[
+.column[
 ```
-    auto body = json::parse(
-        R"({"Inputs":{"input1":[{"tweet_text": "Hi!"}]},"GlobalParameters":{}})"
-    );
+  sample_with_time(200ms, `mainthread`) |
+  publish() | ref_count(); // share
 ```
+]
+
+.column[
+* .accent[
+update to the latest model every 200ms and share]
+]
+]
 
 --
 
+.split-60[
+.column[
 ```
-    return http.create(http_request{url, "POST", headers, body.dump()}) |
-        map([](http_response r){
-            return r.body.`complete`;
-        }) |
-        `merge(poolthread)`;
-});
+iterate(renderers /*, `currentthread`*/) |
+  merge(/*`currentthread`*/) |
+  subscribe<Model>();
 ```
+]
+
+.column[
+* .accent[
+renderers - process the latest model onto the screen]
+* .accent[
+subscribe starts the app]
+]
+]
 
 ???
 
@@ -1162,8 +1244,8 @@ auto requestsentiment = defer([=]() {
 .column[
 
 ```
-auto sentiment = ts
-  | buffer_with_time(500ms, tweetthread)
+auto sentimentaction = tweets |
+  buffer_with_time(500ms, `tweetthread`) |
 ```
 
 ]
@@ -1179,8 +1261,8 @@ buffer tweets into a vector and emit the vector every 500ms]
 .column[
 
 ```
-  | filter([](vector<Tweet> tws){ return !tws.empty(); })
-  | map([=](const vector<Tweet>& tws) {
+  filter([](vector<Tweet> v){ return !v.empty(); }) |
+  map([=](const vector<Tweet>& buffy) {
 ```
 
 ]
@@ -1195,10 +1277,8 @@ buffer tweets into a vector and emit the vector every 500ms]
 .column[
 
 ```
-    vector<string> text = tws
-        | view::transform([](Tweet tw){
-            return tweettext(tw);
-        });
+    vector<string> text = buffy |
+      view::transform(tweettext);
 ```
 
 ]
@@ -1214,8 +1294,8 @@ __range-v3__ is used to extract a vector of strings from the json]
 .column[
 
 ```
-    return sentimentrequest(poolthread, http, text)
-        | map([=](const string& body){
+    return sentimentrequest(poolthread, http, text) |
+      map([=](const string& body){
 ```
 
 ]
@@ -1230,10 +1310,10 @@ __range-v3__ is used to extract a vector of strings from the json]
 .column[
 
 ```
-            auto response = json::parse(body);
-            auto combined = view::zip(response, tws);
-            // . . .
-        }); });
+        auto sentiments = json::parse(body);
+        auto combined = view::zip(sentiments, buffy);
+        // . . .
+      }); });
 ```
 
 ]
@@ -1255,13 +1335,13 @@ __range-v3__ zips the tweet and sentiment vectors to match the tweet with the se
 ![](content/opt--in thread--safety-COMPLETED-green.svg)
 
 - .accent[
-## default to non-thread-safe scheduler]
+## described non-thread-safe scheduler default]
 
 - .accent[
-## specify thread-safe schedulers to coordinate __multiple__ streams]
+## specified thread-safe schedulers to coordinate __multiple__ streams]
 
 - .accent[
-## specify thread-safe schedulers to coordinate __time__ with streams]
+## specified thread-safe schedulers to coordinate __time__ with streams]
 
 ]
 
@@ -1302,6 +1382,8 @@ __range-v3__ zips the tweet and sentiment vectors to match the tweet with the se
 
 [https://github.com/pudae/example/blob/master/rx_test/rxasio/io_service.hpp](https://github.com/pudae/example/blob/master/rx_test/rxasio/io_service.hpp)
 
+--
+
 ```
 class io_service : public scheduler_interface
 {
@@ -1312,10 +1394,19 @@ class io_service : public scheduler_interface
 public:
   explicit io_service(asio::io_service& io_service);
 
+```
+
+--
+
+```
   virtual clock_type::time_point now() const {
     return `clock_type::now`();
   }
+```
 
+--
+
+```
   virtual worker create_worker(composite_subscription cs) const {
     return worker(move(cs), make_shared<`strand_worker`>(io_service_));
   }
@@ -1425,13 +1516,10 @@ virtual void schedule(clock_type::time_point when,
 
 ---
 
-.split-60[
-.column[
-
-![](content/delegate task execution-COMPLETED-green.svg)
+# delegate task execution
 
 - .accent[
-## run tasks using; thread pool, event loop, actor, channel, etc..]
+## delegate tasks to; thread pool, event loop, actor, channel, etc..]
 
 - .accent[
 ## implement a scheduler to delegate tasks]
@@ -1446,6 +1534,22 @@ virtual void schedule(clock_type::time_point when,
     auto schedule(time_point at, 
                   schedulable what) -> void;
 ```
+
+???
+
+> *
+
+---
+
+.split-60[
+.column[
+
+![](content/delegate task execution-COMPLETED-green.svg)
+
+.accent[
+### described `scheduler` and `worker`]
+.accent[
+### implemented `scheduler` and `worker` to delegate tasks to `asio::io_service`]
 
 ]
 
@@ -1623,10 +1727,10 @@ worker
 ## adapted libcurl to rxcpp]
 
 - .accent[
-## libcurl uses an event loop pattern]
+## used __event loop__ pattern to adapt libcurl to rxcpp]
 
 - .accent[
-## callback pattern can also be adapted to rxcpp]
+## __callback__ pattern can also be adapted to rxcpp]
 
 ]
 
@@ -1662,7 +1766,7 @@ worker
 # recap
 
 .accent[
-## algorithms for values distributed in time]
+## values distributed in time]
 
 .center[
 .image-60[
@@ -1788,7 +1892,7 @@ native algorithm support in libraries (asio, boost, poco, etc..)]
 
 .accent[__Aaron Lahman__] made the first prototype of rxcpp.
 
-.accent[__Grigoriy Chudnov__, __Valery Kopylov__] and many other contributors..
+.accent[__Grigoriy Chudnov__, __Valery Kopylov__] and many other rxcpp contributors..
 
 ]
 
@@ -1890,6 +1994,47 @@ classDiagram
 ???
 
 > *
+
+---
+
+# how to call sentiment web service
+
+--
+
+```
+auto requestsentiment = defer([=]() {
+```
+
+--
+
+```
+    std::map<string, string> headers;
+    headers["Content-Type"] = "application/json";
+    headers["Authorization"] = "Bearer " + key;
+```
+
+--
+
+```
+    auto body = json::parse(
+        R"({"Inputs":{"input1":[{"tweet_text": "Hi!"}]},"GlobalParameters":{}})"
+    );
+```
+
+--
+
+```
+    return http.create(http_request{url, "POST", headers, body.dump()}) |
+        map([](http_response r){
+            return r.body.complete;
+        }) |
+        `merge(poolthread)`;
+});
+```
+
+???
+
+> * 
 
 
     </textarea>
