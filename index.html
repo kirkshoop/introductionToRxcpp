@@ -261,7 +261,7 @@ user input and IO are __values distributed in time__
 .accent[
 ### marble diagrams are used to describe values distributed in time.]
 
-<rx-marbles key="skipUntil"></rx-marbles>
+<rx-marbles key="sample"></rx-marbles>
 
 ???
 
@@ -493,7 +493,7 @@ deactivate observable
 ## described flow of a subscription]
 
 - .accent[
-## explained when to use]
+## described when to use a subscription]
 
 ]
 
@@ -1029,18 +1029,18 @@ auto twitter_stream_reconnection = [](auto tweetthread){
 .column[
 
 ```
-            `timeout`(seconds(90), tweetthread) |
+            `timeout`(90s, tweetthread) |
 ```
 
 ]
 .column[
-- .accent[first rule is to reconnect if nothing has arrived for 90s]
+- .accent[first rule is to reconnect if nothing has arrived for 90 seconds]
 ]
 ]
 
 ???
 
-> * error when no string has been appended to the body in 90s 
+> * error when no string has been appended to the body in 90 seconds
 
 --
 
@@ -1620,13 +1620,11 @@ auto worker = create<CURLMsg*>([](subscriber<CURLMsg*> out){
       }
       int handlecount = 0;
       `curl_multi_wait`(curlm, nullptr, 0, 500, &handlecount);
-      if (handlecount == 0) { this_thread::sleep_for(100ms); }
     }
     out.on_completed();
   }) |
   subscribe_on(`httpthread`) |
-  publish() |
-  connect_forever();
+  publish() | connect_forever(); // share
 ```
 
 ???
@@ -1650,13 +1648,11 @@ auto worker = create<CURLMsg*>([](subscriber<CURLMsg*> out){
       }
       int handlecount = 0;
       curl_multi_wait(curlm, nullptr, 0, 500, &handlecount);
-      if (handlecount == 0) { this_thread::sleep_for(100ms); }
     }
     out.`on_completed`();
   }) |
   subscribe_on(httpthread) |
-  publish() |
-  connect_forever();
+  publish() | connect_forever(); // share
 ```
 
 ???
@@ -1727,10 +1723,10 @@ worker
 ## adapted libcurl to rxcpp]
 
 - .accent[
-## used __event loop__ pattern to adapt libcurl to rxcpp]
+## built __polling loop__ to adapt libcurl to rxcpp]
 
 - .accent[
-## __callback__ pattern can also be adapted to rxcpp]
+## __callback__, __future__, __completion port__, etc.. patterns can also be adapted to rxcpp]
 
 ]
 
