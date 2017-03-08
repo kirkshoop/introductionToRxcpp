@@ -329,7 +329,7 @@ deactivate observable
 .column[
 
 - .accent[demonstrate the contract of a subscription]
-- .accent[### observables are lazy]
+- .accent[### observables defer work]
 
 ]
 ]
@@ -363,7 +363,7 @@ deactivate observable
 .column[
 
 - .accent[demonstrate the contract of a subscription]
-- .accent[### observables are lazy]
+- .accent[### observables defer work]
 - .accent[### calls to the subscriber will never overlap in time]
 
 ]
@@ -403,7 +403,7 @@ deactivate observable
 .column[
 
 - .accent[demonstrate the contract of a subscription]
-- .accent[### observables are lazy]
+- .accent[### observables defer work]
 - .accent[### calls to the subscriber will never overlap in time]
 - .accent[### on_error is the last call that a subscriber will receive]
 - .accent[### on_completed is the last call that a subscriber will receive]
@@ -445,11 +445,11 @@ deactivate observable
 .column[
 
 - .accent[demonstrate the contract of a subscription]
-- .accent[### observables are lazy]
+- .accent[### observables defer work]
 - .accent[### calls to the subscriber will never overlap in time]
 - .accent[### on_error is the last call that a subscriber will receive]
 - .accent[### on_completed is the last call that a subscriber will receive]
-- .accent[### unsubscribe will cancel a subscription]
+- .accent[### unsubscribe is the destructor for the subscription lifetime]
 
 ]
 ]
@@ -464,6 +464,9 @@ deactivate observable
 
 .accent[
 ## subcriptions are useful to..]
+
+- .accent[
+### defer work]
 
 - .accent[
 ### collect values and process periodically]
@@ -1883,6 +1886,8 @@ native algorithm support in libraries (asio, boost, poco, etc..)]
 .column[
 
 ## credits
+
+.accent[__Gor Nishanov__] introduced me to .accent[__Axel Naumann__] who arranged my visit.
 
 .accent[__Eric Mittelette__] shaped this presentation from start to finish. I am deeply grateful for all his time and effort.
 
