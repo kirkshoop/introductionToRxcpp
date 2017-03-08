@@ -590,7 +590,7 @@ auto map = [](auto selector){
 ```
       return in 
         | subscribe(
-          out.get_subscriber(),
+          out.get_subscription(),
           [](auto v){
             out.on_next(`selector(v)`);
           },
